@@ -243,8 +243,42 @@ class pdf_blchiffre extends ModelePDFDeliveryOrder
 				}
 				$object->commande=$commande;	// We set order of shipment onto delivery.
 				$object->commande->loadExpeditions();
-
-				$object->lines = $object->commande->lines;
+				//$object->lines = $expedition->lines; //fk_origin_line
+				
+				//var_dump($object->lines);
+				// Récupération des infos
+				$Tcorrespondance = array();
+				foreach ($object->commande->lines as $coLinesKey => &$coLines)
+				{
+				    $Tcorrespondance[$coLines->id] = $coLinesKey;
+				}
+				foreach ($object->lines as &$line)
+				{
+				    if(!empty($Tcorrespondance[$line->fk_origin_line]))
+				    {
+				        $coLine = $object->commande->lines[$Tcorrespondance[$line->fk_origin_line]];
+				        $coLine->qty = $line->qty_shipped;
+				        $line = $coLine;
+				        
+				        //var_dump($line);
+				        $coLine->total_ht = $coLine->qty * $coLine->price;
+				        $coLine->total_ttc = $coLine->total_ht * ( 1 + $coLine->total_tva / 100 );
+				        $coLine->total_tva = $coLine->total_ttc - $coLine->total_ht;
+				        
+				     
+				    }
+				}
+				/*
+                    public 'element' => string 'expeditionlignebatch' (length=20)
+                    public 'sellby' => string '' (length=0)
+                    public 'eatby' => string '' (length=0)
+                    public 'batch' => string 'REEXISORS6200650040_CF1711-041' (length=30)
+                    public 'dluo_qty' => string '2' (length=1)
+                    public 'entrepot_id' => null
+                    public 'fk_origin_stock' => string '100' (length=3)
+                    public 'fk_expeditiondet' => string '1211' (length=4)
+				 */
+				
 				$nblignes = count($object->lines);
 
 				$pdf->Open();
