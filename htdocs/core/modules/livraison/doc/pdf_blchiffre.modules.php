@@ -168,6 +168,7 @@ class pdf_blchiffre extends ModelePDFDeliveryOrder
 		$outputlangs->load("products");
 		$outputlangs->load("deliveries");
 		$outputlangs->load("sendings");
+		$outputlangs->load("productbatch");
 
 		if ($conf->expedition->dir_output)
 		{
@@ -250,7 +251,7 @@ class pdf_blchiffre extends ModelePDFDeliveryOrder
 				{
 				    $Tcorrespondance[$coLines->id] = $coLinesKey;
 				}
-				foreach ($object->lines as &$line)
+				foreach ($object->lines as $lineKey => &$line)
 				{
 				    if(isset($Tcorrespondance[$line->fk_origin_line]))
 				    {
@@ -267,11 +268,17 @@ class pdf_blchiffre extends ModelePDFDeliveryOrder
 				        $line->total_tva = $coLine->total_ttc - $coLine->total_ht;
 				        $line->remise_percent = $coLine->remise_percent;
 				        //$coLine->price = $coLine->subprice;
-				        
-				     
 				    }
+				    
+				    // Récupération des numéros de coulée
+				    if(!empty($expedition->lines[$lineKey]->detail_batch))
+				    {
+				        $line->detail_batch = $expedition->lines[$lineKey]->detail_batch;
+				    }
+				    
 				}
 				
+				// elements a récupérer pour la gestion des lots
 				/*
                     public 'element' => string 'expeditionlignebatch' (length=20)
                     public 'sellby' => string '' (length=0)
