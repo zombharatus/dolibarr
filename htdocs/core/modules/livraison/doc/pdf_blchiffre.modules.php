@@ -278,18 +278,6 @@ class pdf_blchiffre extends ModelePDFDeliveryOrder
 				    
 				}
 				
-				// elements a récupérer pour la gestion des lots
-				/*
-                    public 'element' => string 'expeditionlignebatch' (length=20)
-                    public 'sellby' => string '' (length=0)
-                    public 'eatby' => string '' (length=0)
-                    public 'batch' => string 'REEXISORS6200650040_CF1711-041' (length=30)
-                    public 'dluo_qty' => string '2' (length=1)
-                    public 'entrepot_id' => null
-                    public 'fk_origin_stock' => string '100' (length=3)
-                    public 'fk_expeditiondet' => string '1211' (length=4)
-				 */
-				
 				$nblignes = count($object->lines);
 
 				$pdf->Open();
