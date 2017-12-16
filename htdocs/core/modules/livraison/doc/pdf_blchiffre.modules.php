@@ -243,9 +243,7 @@ class pdf_blchiffre extends ModelePDFDeliveryOrder
 				}
 				$object->commande=$commande;	// We set order of shipment onto delivery.
 				$object->commande->loadExpeditions();
-				//$object->lines = $expedition->lines; //fk_origin_line
 				
-				//var_dump($object->lines);
 				// Récupération des infos
 				$Tcorrespondance = array();
 				foreach ($object->commande->lines as $coLinesKey => &$coLines)
@@ -254,20 +252,26 @@ class pdf_blchiffre extends ModelePDFDeliveryOrder
 				}
 				foreach ($object->lines as &$line)
 				{
-				    if(!empty($Tcorrespondance[$line->fk_origin_line]))
+				    if(isset($Tcorrespondance[$line->fk_origin_line]))
 				    {
 				        $coLine = $object->commande->lines[$Tcorrespondance[$line->fk_origin_line]];
-				        $coLine->qty = $line->qty_shipped;
-				        $line = $coLine;
+				        $line->qty = $line->qty_shipped;
 				        
-				        //var_dump($line);
-				        $coLine->total_ht = $coLine->qty * $coLine->price;
-				        $coLine->total_ttc = $coLine->total_ht * ( 1 + $coLine->total_tva / 100 );
-				        $coLine->total_tva = $coLine->total_ttc - $coLine->total_ht;
+				        //var_dump($coLine);
+				        $line->tva_tx = $coLine->tva_tx;
+				        $line->fk_unit = $coLine->fk_unit;
+				        $line->price = $coLine->price;
+				        $line->subprice = $coLine->subprice;
+				        $line->total_ht =  $line->qty * $coLine->price;
+				        $line->total_ttc = $coLine->total_ht * ( 1 + $coLine->tva_tx / 100 );
+				        $line->total_tva = $coLine->total_ttc - $coLine->total_ht;
+				        $line->remise_percent = $coLine->remise_percent;
+				        //$coLine->price = $coLine->subprice;
 				        
 				     
 				    }
 				}
+				
 				/*
                     public 'element' => string 'expeditionlignebatch' (length=20)
                     public 'sellby' => string '' (length=0)
@@ -294,7 +298,7 @@ class pdf_blchiffre extends ModelePDFDeliveryOrder
 
 				$pdf->SetMargins($this->marge_gauche, $this->marge_haute, $this->marge_droite);   // Left, Top, Right
 
-				/*
+				
 				// Positionne $this->atleastonediscount si on a au moins une remise
 				for ($i = 0 ; $i < $nblines ; $i++)
 				{
@@ -312,7 +316,7 @@ class pdf_blchiffre extends ModelePDFDeliveryOrder
 					$this->posxdiscount+=($this->postotalht - $this->posxdiscount);
 					//$this->postotalht;
 				}
-				*/
+				
 
 				// New page
 				$pdf->AddPage();
