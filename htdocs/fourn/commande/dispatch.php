@@ -921,7 +921,7 @@ if ($id > 0 || ! empty($ref)) {
 				print '<td>'.dol_print_date($db->jdate($objp->date_delivery), 'day').'</td>';
 
 				if (! empty($conf->productbatch->enabled)) {
-					print '<td class="dispatch_batch_number">' . $objp->batch . '</td>';
+					print '<td class="dispatch_batch_number" data-col="batch"  data-batch="' . htmlentities($objp->batch) . '" data-productid="' . $objp->fk_product . '" >' . $objp->batch . '</td>';
 					print '<td class="dispatch_dluo">' . dol_print_date($db->jdate($objp->eatby), 'day') . '</td>';
 					print '<td class="dispatch_dlc">' . dol_print_date($db->jdate($objp->sellby), 'day') . '</td>';
 				}
