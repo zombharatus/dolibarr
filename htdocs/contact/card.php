@@ -80,6 +80,14 @@ $result = restrictedArea($user, 'contact', $id, 'socpeople&societe', '', '', 'ro
 // Initialize technical object to manage hooks of page. Note that conf->hooks_modules contains array of hook context
 $hookmanager->initHooks(array('contactcard','globalcard'));
 
+if ($id > 0) $object->fetch($id);
+
+if (! ($object->id > 0) && $action == 'view')
+{
+	$langs->load("errors");
+	print($langs->trans('ErrorRecordNotFound'));
+	exit;
+}
 
 /*
  *	Actions
@@ -919,7 +927,7 @@ else
 
             // Civility
             print '<tr><td><label for="civility_code">'.$langs->trans("UserTitle").'</label></td><td colspan="3">';
-            print $formcompany->select_civility(GETPOSTISSET("civility_code")?GETPOST("civility", "aZ09"):$object->civility_code, 'civility_code');
+            print $formcompany->select_civility(GETPOSTISSET("civility_code")?GETPOST("civility_code", "aZ09"):$object->civility_code, 'civility_code');
             print '</td></tr>';
 
             print '<tr><td><label for="title">'.$langs->trans("PostOrFunction").'</label></td>';
