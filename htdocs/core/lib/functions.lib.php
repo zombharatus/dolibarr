@@ -1226,7 +1226,7 @@ function dol_get_fiche_head($links = array(), $active = '', $title = '', $notab 
 		$tabsname=str_replace("@", "", $picto);
 		$out.='<div id="moretabs'.$tabsname.'" class="inline-block tabsElem">';
 		$out.='<a href="#" class="tab moretab inline-block tabunactive reposition">'.$langs->trans("More").'... ('.$nbintab.')</a>';
-		$out.='<div id="moretabsList'.$tabsname.'" style="position: absolute; '.$left.': -999em; text-align: '.$left.'; margin:0px; padding:2px">';
+		$out.='<div id="moretabsList'.$tabsname.'" style="position: absolute; '.$left.': -999em; text-align: '.$left.'; margin:0px; padding:2px; z-index:10;">';
 		$out.=$outmore;
 		$out.='</div>';
 		$out.='<div></div>';
@@ -1787,6 +1787,7 @@ function dol_print_date($time, $format = '', $tzoutput = 'tzserver', $outputlang
 		$format=str_replace('%a', '__a__', $format);
 		$format=str_replace('%A', '__A__', $format);
 	}
+
 
 	// Analyze date
 	$reg=array();
@@ -4520,7 +4521,6 @@ function price2num($amount, $rounding = '', $alreadysqlnb = 0)
 	return $amount;
 }
 
-
 /**
  * Output a dimension with best unit
  *
@@ -5756,9 +5756,9 @@ function dol_textishtml($msg, $option = 0)
 		elseif (preg_match('/<body/i', $msg))			return true;
 		elseif (preg_match('/<(b|em|i|u)>/i', $msg))		return true;
 		elseif (preg_match('/<br\/>/i', $msg))	  return true;
-		elseif (preg_match('/<(br|div|font|li|p|span|strong|table)>/i', $msg)) 	  return true;
-		elseif (preg_match('/<(br|div|font|li|p|span|strong|table)\s+[^<>\/]*>/i', $msg)) return true;
-		elseif (preg_match('/<(br|div|font|li|p|span|strong|table)\s+[^<>\/]*\/>/i', $msg)) return true;
+		elseif (preg_match('/<(br|div|font|li|p|span|strong|table|s)>/i', $msg)) 	  return true;
+		elseif (preg_match('/<(br|div|font|li|p|span|strong|table|s)\s+[^<>\/]*>/i', $msg)) return true;
+		elseif (preg_match('/<(br|div|font|li|p|span|strong|table|s)\s+[^<>\/]*\/>/i', $msg)) return true;
 		elseif (preg_match('/<img\s+[^<>]*src[^<>]*>/i', $msg)) return true;	// must accept <img src="http://example.com/aaa.png" />
 		elseif (preg_match('/<a\s+[^<>]*href[^<>]*>/i', $msg)) return true;	// must accept <a href="http://example.com/aaa.png" />
 		elseif (preg_match('/<h[0-9]>/i', $msg))			return true;
@@ -7588,7 +7588,7 @@ function natural_search($fields, $value, $mode = 0, $nofirstand = 0)
 				$i3 = 0;
 				foreach($tmpcrits as $tmpcrit)
 				{
-					if(empty($tmpcrit)) continue;
+                    if($tmpcrit !== '0' && empty($tmpcrit)) continue;
 
 					$newres .= (($i2 > 0 || $i3 > 0) ? ' OR ' : '');
 
