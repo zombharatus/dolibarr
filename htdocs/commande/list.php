@@ -808,7 +808,7 @@ if ($resql)
 			print '</td>';
 
 			// Show shippable Icon (create subloop, so may be slow)
-			if ($conf->stock->enabled)
+			if ($conf->stock->enabled && !empty($conf->global->LIST_COMMAND_LIST_STOCK))
 			{
 				$langs->load("stocks");
 				if (($obj->fk_statut > 0) && ($obj->fk_statut < 3))
