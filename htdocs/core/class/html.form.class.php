@@ -2093,7 +2093,7 @@ class Form
 		    $selectFieldsGrouped = ", p.stock";
 		}
 
-		$sql = "SELECT ";
+		$sql = "SELECT DISTINCT ";
 		$sql.= $selectFields . $selectFieldsGrouped;
 
 		if (! empty($conf->global->PRODUCT_SORT_BY_CATEGORY))
