@@ -197,6 +197,9 @@ class FormProduct
 	private function get_parent_path($tab, $final_label = '')
 	{
 		//phpcs:enable
+
+		return $tab['label'];
+
 		if (empty($final_label)) $final_label = $tab['label'];
 
 		if (empty($tab['parent_id'])) return $final_label;
