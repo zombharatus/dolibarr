@@ -927,7 +927,7 @@ if ($resql)
 			print $generic_commande->getNomUrl(1, ($search_status != 2 ? 0 : $obj->fk_statut), 0, 0, 0, 1, 1);
 
 			// Show shippable Icon (create subloop, so may be slow)
-			if ($conf->stock->enabled)
+			if ($conf->stock->enabled && !empty($conf->global->LIST_COMMAND_LIST_STOCK))
 			{
 				$langs->load("stocks");
 				if (($obj->fk_statut > 0) && ($obj->fk_statut < 3))
