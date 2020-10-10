@@ -312,9 +312,10 @@ if (!empty($sql_select))
 	if ($sref) $sql .= " AND ".$doc_number." LIKE '%".$db->escape($sref)."%'";
 	if ($sprod_fulldescr)
 	{
-	    $sql .= " AND (d.description LIKE '%".$db->escape($sprod_fulldescr)."%'";
-	    if (GETPOST('type_element') != 'fichinter') $sql .= " OR p.ref LIKE '%".$db->escape($sprod_fulldescr)."%'";
-	    if (GETPOST('type_element') != 'fichinter') $sql .= " OR p.label LIKE '%".$db->escape($sprod_fulldescr)."%'";
+		$sql.= " AND (";
+		$sql.= natural_search('d.description', $sprod_fulldescr, 0, true);
+		if (GETPOST('type_element') != 'fichinter') $sql.= " OR ".natural_search('p.ref', $sprod_fulldescr, 0,true);
+		if (GETPOST('type_element') != 'fichinter') $sql.= " OR ".natural_search('p.label', $sprod_fulldescr, 0,true);
 	    $sql .= ")";
 	}
 	$sql .= $db->order($sortfield, $sortorder);
