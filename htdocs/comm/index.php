@@ -82,6 +82,8 @@ llxHeader("", $langs->trans("CommercialArea"));
 
 print load_fiche_titre($langs->trans("CommercialArea"), '', 'commercial');
 
+print '<p style="font-weight: bold">Attention : pour des raisons de performances, le nombres d\'éléments affichés dans certaines listes à été bloqué à 10 </p>';
+
 print '<div class="fichecenter"><div class="fichethirdleft">';
 
 if (!empty($conf->global->MAIN_SEARCH_FORM_ON_HOME_AREAS))     // This is useless due to the global search combo
@@ -161,6 +163,7 @@ if (!empty($conf->propal->enabled) && $user->rights->propal->lire)
 	$sql .= " AND p.entity IN (".getEntity('propal').")";
 	if (!$user->rights->societe->client->voir && !$socid) $sql .= " AND s.rowid = sc.fk_soc AND sc.fk_user = ".$user->id;
 	if ($socid)	$sql .= " AND s.rowid = ".$socid;
+	$sql.= " LIMIT 10";
 
 	$resql = $db->query($sql);
 	if ($resql)
@@ -252,6 +255,7 @@ if (!empty($conf->supplier_proposal->enabled) && $user->rights->supplier_proposa
     if (!$user->rights->societe->client->voir && !$socid) $sql .= " AND s.rowid = sc.fk_soc AND sc.fk_user = ".$user->id;
     if ($socid)	$sql .= " AND s.rowid = ".$socid;
 
+	$sql.= " LIMIT 10";
     $resql = $db->query($sql);
     if ($resql)
     {
@@ -339,6 +343,7 @@ if (!empty($conf->commande->enabled) && $user->rights->commande->lire)
 	if (!$user->rights->societe->client->voir && !$socid) $sql .= " AND s.rowid = sc.fk_soc AND sc.fk_user = ".$user->id;
 	if ($socid)	$sql .= " AND c.fk_soc = ".$socid;
 
+	$sql.= " LIMIT 10";
 	$resql = $db->query($sql);
 	if ($resql)
 	{
@@ -432,6 +437,7 @@ if ((!empty($conf->fournisseur->enabled) && empty($conf->global->MAIN_USE_NEW_SU
     if (!$user->rights->societe->client->voir && !$socid) $sql .= " AND s.rowid = sc.fk_soc AND sc.fk_user = ".$user->id;
     if ($socid)	$sql .= " AND cf.fk_soc = ".$socid;
 
+	$sql.= " LIMIT 10";
     $resql = $db->query($sql);
     if ($resql)
     {
@@ -745,6 +751,7 @@ if (!empty($conf->propal->enabled) && $user->rights->propal->lire)
 	if ($socid) $sql .= " AND s.rowid = ".$socid;
 	$sql .= " ORDER BY p.rowid DESC";
 
+	$sql.= " LIMIT 10";
 	$result = $db->query($sql);
 	if ($result)
 	{
@@ -853,6 +860,7 @@ if (!empty($conf->commande->enabled) && $user->rights->commande->lire)
 	if ($socid) $sql .= " AND s.rowid = ".$socid;
 	$sql .= " ORDER BY c.rowid DESC";
 
+	$sql.= " LIMIT 10";
 	$result = $db->query($sql);
 	if ($result)
 	{
