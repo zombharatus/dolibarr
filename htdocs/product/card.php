@@ -225,7 +225,7 @@ if (empty($reshook))
 	        $units = GETPOST('units', 'int');
 
             $object->ref                   = $ref;
-            $object->label                 = GETPOST('label', 'alphanohtml');
+            $object->label                 = GETPOST('label', 'none');
             $object->price_base_type       = GETPOST('price_base_type', 'aZ09');
 
             if ($object->price_base_type == 'TTC')
@@ -406,7 +406,7 @@ if (empty($reshook))
 				$object->oldcopy = clone $object;
 
                 $object->ref                    = $ref;
-                $object->label                  = GETPOST('label', 'alphanohtml');
+                $object->label                  = GETPOST('label', 'none');
                 $object->description            = dol_htmlcleanlastbr(GETPOST('desc', 'none'));
             	$object->url = GETPOST('url');
     			if (!empty($conf->global->MAIN_DISABLE_NOTES_TAB))
