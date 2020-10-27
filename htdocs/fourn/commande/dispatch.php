@@ -801,6 +801,10 @@ if ($id > 0 || !empty($ref)) {
 
 						// Qty to dispatch
 						print '<td class="right">';
+						if($remaintodispatch>0){
+							print '<span class="AutoFillQty" style="cursor: pointer;" data-rowname="qty'.$suffix.'" data-value="'.$remaintodispatch.'" ><span class="fa fa-arrow-right" ></span></span>';
+							//print img_picto("Auto fill",'rightarrow', "class='AutoFillQty' data-rowname='qty".$suffix."' data-value='".$remaintodispatch."'");
+						}
 						print '<input id="qty'.$suffix.'" name="qty'.$suffix.'" type="text" class="width50 right" value="'.(GETPOSTISSET('qty'.$suffix) ? GETPOST('qty'.$suffix, 'int') : (empty($conf->global->SUPPLIER_ORDER_DISPATCH_FORCE_QTY_INPUT_TO_ZERO) ? $remaintodispatch : 0)).'">';
 						print '</td>';
 
@@ -872,6 +876,15 @@ if ($id > 0 || !empty($ref)) {
 
 		print "</table>\n";
 		print '</div>';
+
+		print "\n".'<script type="text/javascript" language="javascript">';
+		//Add js for AutoFill
+		print ' $(document).ready(function () {';
+		print ' 	$(".AutoFillQty").on(\'click touchstart\', function(){
+							$("input[name="+$(this).data(\'rowname\')+"]").val($(this).data("value")).trigger("change");
+						});';
+		print '	});'."\n";
+		print '	</script>'."\n";
 
 		if ($nbproduct)
 		{
