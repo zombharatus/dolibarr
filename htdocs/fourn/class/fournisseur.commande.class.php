@@ -1344,7 +1344,7 @@ class CommandeFournisseur extends CommonOrder
         $sql .= ", ".$conf->entity;
         $sql .= ", ".$this->socid;
         $sql .= ", ".($this->fk_project > 0 ? $this->fk_project : "null");
-        $sql .= ", '".$this->db->idate($now)."'";
+        $sql .= ", '".$this->db->idate($date)."'";
 		$sql .= ", ".($this->date_livraison ? "'".$this->db->idate($this->date_livraison)."'" : "null");
         $sql .= ", ".$user->id;
         $sql .= ", ".self::STATUS_DRAFT;
@@ -1725,7 +1725,7 @@ class CommandeFournisseur extends CommonOrder
 					}
 					else
 					{
-						if (($qty % $prod->packaging) > 0)
+						if (!empty($prod->packaging) && ($qty % $prod->packaging) > 0)
 						{
 							$coeff = intval($qty / $prod->packaging) + 1;
 							$qty = $prod->packaging * $coeff;
@@ -2298,8 +2298,7 @@ class CommandeFournisseur extends CommonOrder
 
             // TODO LDR01 Add a control test to accept only if ALL predefined products are received (same qty).
 
-
-            if (!$error)
+            if (empty($error))
             {
                 $this->db->begin();
 
@@ -2312,17 +2311,18 @@ class CommandeFournisseur extends CommonOrder
                 $resql = $this->db->query($sql);
                 if ($resql)
                 {
-                    $result = 0;
+					$result = 1;
                     $old_statut = $this->statut;
                     $this->statut = $statut;
 					$this->actionmsg2 = $comment;
 
                     // Call trigger
-                    $result = $this->call_trigger('ORDER_SUPPLIER_RECEIVE', $user);
-                    if ($result < 0) $error++;
+                    $result_trigger = $this->call_trigger('ORDER_SUPPLIER_RECEIVE', $user);
+                    if ($result_trigger < 0) $error++;
+					else $result += (int) $result_trigger;
                     // End call triggers
 
-                    if (!$error)
+                    if (empty($error))
                     {
                         $this->db->commit();
                     }
