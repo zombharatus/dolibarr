@@ -311,7 +311,7 @@ if ($sall) $sql .= natural_search(array_keys($fieldstosearchall), $sall);
 if ($search_billed != '' && $search_billed >= 0) $sql .= ' AND c.facture = '.$search_billed;
 if ($search_status <> '')
 {
-	if ($search_status < 4 && $search_status > -3)
+	if ($search_status < 4 && $search_status > -2)
 	{
 		if ($search_status == 1 && empty($conf->expedition->enabled)) $sql .= ' AND c.fk_statut IN (1,2)'; // If module expedition disabled, we include order with status 'sending in process' into 'validated'
 		else $sql .= ' AND c.fk_statut = '.$search_status; // brouillon, validee, en cours, annulee
@@ -323,7 +323,7 @@ if ($search_status <> '')
 	if ($search_status == -2)	// To process
 	{
 		//$sql.= ' AND c.fk_statut IN (1,2,3) AND c.facture = 0';
-		$sql .= " AND ((c.fk_statut IN (1,2)) OR (c.fk_statut = 3 AND c.facture = 0))"; // If status is 2 and facture=1, it must be selected
+		$sql .= " AND c.fk_statut IN (1,2)"; // If status is 2 and facture=1, it must be selected
 	}
 	if ($search_status == -3)	// To bill
 	{
@@ -810,6 +810,7 @@ if ($resql)
 			Commande::STATUS_VALIDATED=>$langs->trans("StatusOrderValidated"),
 			Commande::STATUS_SHIPMENTONPROCESS=>$langs->trans("StatusOrderSentShort"),
 			Commande::STATUS_CLOSED=>$langs->trans("StatusOrderDelivered"),
+			-2=>$langs->trans("StatusOrderValidatedShort").'+'.$langs->trans("StatusOrderSentShort"),
 			-3=>$langs->trans("StatusOrderValidatedShort").'+'.$langs->trans("StatusOrderSentShort").'+'.$langs->trans("StatusOrderDelivered"),
 			Commande::STATUS_CANCELED=>$langs->trans("StatusOrderCanceledShort")
 		);
