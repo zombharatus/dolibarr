@@ -1114,6 +1114,9 @@ if ($action == 'create')
             // Load shipments already done for same order
             $object->loadExpeditions();
 
+
+            $alreadyQtyBatchSetted = $alreadyQtySetted = array();
+
             if ($numAsked)
             {
                 print '<tr class="liste_titre">';
@@ -1418,12 +1421,40 @@ if ($action == 'create')
 									$stock = + $stock_warehouse->real; // Convert it to number
 									$deliverableQty = min($quantityToBeDelivered, $stock);
 									$deliverableQty = max(0, $deliverableQty);
+
 									// Quantity to send
 									print '<!-- subj='.$subj.'/'.$nbofsuggested.' --><tr '.((($subj + 1) == $nbofsuggested) ? $bc[$var] : '').'>';
 									print '<td colspan="3" ></td><td class="center"><!-- qty to ship (no lot management for product line indiceAsked='.$indiceAsked.') -->';
 									if ($line->product_type == Product::TYPE_PRODUCT || !empty($conf->global->STOCK_SUPPORTS_SERVICES))
 									{
-										print '<input name="qtyl'.$indiceAsked.'_'.$subj.'" id="qtyl'.$indiceAsked.'" type="text" size="4" value="'.$deliverableQty.'">';
+										// START THERSANE ADD
+										if(isset($alreadyQtySetted[$line->fk_product][intval($warehouse_id)])){
+											$deliverableQty = min($quantityToBeDelivered, $stock - $alreadyQtySetted[$line->fk_product][intval($warehouse_id)]);
+										}
+										else{
+											if(!isset($alreadyQtySetted[$line->fk_product])){
+												$alreadyQtySetted[$line->fk_product] = array();
+											}
+
+											$deliverableQty = min($quantityToBeDelivered, $stock);
+										}
+
+										if ($deliverableQty < 0) $deliverableQty = 0;
+
+										$tooltip = '';
+										if(!empty($alreadyQtySetted[$line->fk_product][intval($warehouse_id)])){
+											$tooltip = ' class="classfortooltip" title="Qtés de stock déja attribuées sur les lignes précédantes : '.$alreadyQtySetted[$line->fk_product][intval($warehouse_id)].'" ';
+										}
+
+										$alreadyQtySetted[$line->fk_product][intval($warehouse_id)] = $deliverableQty + $alreadyQtySetted[$line->fk_product][intval($warehouse_id)];
+
+										$inputName = 'qtyl'.$indiceAsked.'_'.$subj;
+										if(GETPOSTISSET($inputName)){
+											$deliverableQty = GETPOST($inputName, 'int');
+										}
+										// END THERSANE ADD
+
+										print '<input '.$tooltip.' name="qtyl'.$indiceAsked.'_'.$subj.'" id="qtyl'.$indiceAsked.'" type="text" size="4" value="'.$deliverableQty.'">';
 										print '<input name="ent1'.$indiceAsked.'_'.$subj.'" type="hidden" value="'.$warehouse_id.'">';
 									}
 									else print $langs->trans("NA");
@@ -1507,12 +1538,41 @@ if ($action == 'create')
 								if (($stock_warehouse->real > 0) && (count($stock_warehouse->detail_batch))) {
 							        foreach ($stock_warehouse->detail_batch as $dbatch)
 									{
-										//var_dump($dbatch);
+										// START THERSANE ADD
 										$batchStock = + $dbatch->qty; // To get a numeric
-										$deliverableQty = min($quantityToBeDelivered, $batchStock);
+										if(isset($alreadyQtyBatchSetted[$line->fk_product][$dbatch->batch][intval($warehouse_id)])){
+											$deliverableQty = min($quantityToBeDelivered, $batchStock - $alreadyQtyBatchSetted[$line->fk_product][$dbatch->batch][intval($warehouse_id)]);
+										}
+										else{
+											if(!isset($alreadyQtyBatchSetted[$line->fk_product])){
+												$alreadyQtyBatchSetted[$line->fk_product] = array();
+											}
+
+											if(!isset($alreadyQtyBatchSetted[$line->fk_product][$dbatch->batch])){
+												$alreadyQtyBatchSetted[$line->fk_product][$dbatch->batch] = array();
+											}
+
+											$deliverableQty = min($quantityToBeDelivered, $batchStock);
+										}
+
 										if ($deliverableQty < 0) $deliverableQty = 0;
+
+										$inputName = 'qtyl'.$indiceAsked.'_'.$subj;
+										if(GETPOSTISSET($inputName)){
+											$deliverableQty = GETPOST($inputName, 'int');
+										}
+
+										$tooltip = '';
+										if(!empty($alreadyQtyBatchSetted[$line->fk_product][$dbatch->batch][intval($warehouse_id)])){
+											$tooltip = ' class="classfortooltip" title="Qtés de stock déja attribuées sur les lignes précédantes : '.$alreadyQtyBatchSetted[$line->fk_product][$dbatch->batch][intval($warehouse_id)].'" ';
+										}
+
+										$alreadyQtyBatchSetted[$line->fk_product][$dbatch->batch][intval($warehouse_id)] = $deliverableQty + $alreadyQtyBatchSetted[$line->fk_product][$dbatch->batch][intval($warehouse_id)];
+
+										// END THERSANE ADD
+
 										print '<!-- subj='.$subj.'/'.$nbofsuggested.' --><tr '.((($subj + 1) == $nbofsuggested) ? $bc[$var] : '').'><td colspan="3"></td><td class="center">';
-										print '<input name="qtyl'.$indiceAsked.'_'.$subj.'" id="qtyl'.$indiceAsked.'_'.$subj.'" type="text" size="4" value="'.$deliverableQty.'">';
+										print '<input '.$tooltip.' name="qtyl'.$indiceAsked.'_'.$subj.'" id="qtyl'.$indiceAsked.'_'.$subj.'" type="text" size="4" value="'.$deliverableQty.'">';
 										print '</td>';
 
 										print '<td class="left">';
