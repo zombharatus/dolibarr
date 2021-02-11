@@ -1405,12 +1405,46 @@ if ($action == 'create')
 							$subj = 0;
 	    					// Define nb of lines suggested for this order line
 							$nbofsuggested = 0;
-							foreach ($product->stock_warehouse as $warehouse_id=>$stock_warehouse)
+
+							// TODO : FACTORISER CETTE FONCTION
+							uasort ( $product->stock_warehouse , function ($a, $b){
+								if ($a->real == $b->real) { return 0; }
+								return ($a->real < $b->real) ? -1 : 1;
+							});
+
+							foreach ($product->stock_warehouse as $warehouse_id=>&$stock_warehouse)
 							{
 								if ($stock_warehouse->real > 0)
 								{
 	                                $nbofsuggested++;
 							    }
+
+								// Sort Batch priority
+								if(is_array($stock_warehouse->detail_batch) && !empty($stock_warehouse->detail_batch)) {
+									// TODO : FACTORISER CETTE FONCTION
+									uasort($stock_warehouse->detail_batch, function ($a, $b) {
+										$compare = 0;
+										$multiplePow = 0;
+										// The comparison function must return an integer less than, equal to, or greater than zero if the first argument is considered to be respectively less than, equal to, or greater than the second.
+
+										// PRIORITY FOR QTY : Eliminate place with small qty first
+										$multiplePow++;
+										$multiple = pow(10, $multiplePow);
+										$compare += (($a->qty < $b->qty) ? -1 : 1) * $multiple;
+
+										// PRIORITY FOR SELL EXPIRATION DATE
+										$multiplePow++;
+										$multiple = pow(10, $multiplePow);
+										$compare += (($a->sellby < $b->sellby) ? -1 : 1) * $multiple;
+
+										// PRIORITY FOR CONSUMPTION EXPIRATION DATE
+										$multiplePow++;
+										$multiple = pow(10, $multiplePow);
+										$compare += (($a->eatby < $b->eatby) ? -1 : 1) * $multiple;
+
+										return $compare;
+									});
+								}
 							}
 							$tmpwarehouseObject = new Entrepot($db);
 							foreach ($product->stock_warehouse as $warehouse_id=>$stock_warehouse)    // $stock_warehouse is product_stock
@@ -1521,6 +1555,13 @@ if ($action == 'create')
 
 							$tmpwarehouseObject = new Entrepot($db);
 							$productlotObject = new Productlot($db);
+
+							// TODO : FACTORISER CETTE FONCTION
+							uasort ( $product->stock_warehouse , function ($a, $b){
+								if ($a->real == $b->real) { return 0; }
+								return ($a->real < $b->real) ? -1 : 1;
+							});
+
 							// Define nb of lines suggested for this order line
 							$nbofsuggested = 0;
 							foreach ($product->stock_warehouse as $warehouse_id=>$stock_warehouse)
@@ -1530,6 +1571,31 @@ if ($action == 'create')
 									{
 	                                    $nbofsuggested++;
 									}
+
+									// TODO : FACTORISER CETTE FONCTION
+									// Sort Batch priority
+									uasort($stock_warehouse->detail_batch, function ($a, $b) {
+										$compare = 0;
+										$multiplePow = 0;
+										// The comparison function must return an integer less than, equal to, or greater than zero if the first argument is considered to be respectively less than, equal to, or greater than the second.
+
+										// PRIORITY FOR QTY : Eliminate place with small qty first
+										$multiplePow++;
+										$multiple = pow(10, $multiplePow);
+										$compare += (($a->qty < $b->qty) ? -1 : 1) * $multiple;
+
+										// PRIORITY FOR SELL EXPIRATION DATE
+										$multiplePow++;
+										$multiple = pow(10, $multiplePow);
+										$compare += (($a->sellby < $b->sellby) ? -1 : 1) * $multiple;
+
+										// PRIORITY FOR CONSUMPTION EXPIRATION DATE
+										$multiplePow++;
+										$multiple = pow(10, $multiplePow);
+										$compare += (($a->eatby < $b->eatby) ? -1 : 1) * $multiple;
+
+										return $compare;
+									});
 							    }
 							}
 							foreach ($product->stock_warehouse as $warehouse_id=>$stock_warehouse)
