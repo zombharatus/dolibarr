@@ -1558,13 +1558,13 @@ if ($action == 'create' && $usercancreate)
 			$ref_client = (!empty($objectsrc->ref_client) ? $objectsrc->ref_client : '');
 
 			$soc = $objectsrc->thirdparty;
-			$cond_reglement_id	= (!empty($objectsrc->cond_reglement_id) ? $objectsrc->cond_reglement_id : (!empty($soc->cond_reglement_id) ? $soc->cond_reglement_id : 0)); // TODO maybe add default value option
-			$mode_reglement_id	= (!empty($objectsrc->mode_reglement_id) ? $objectsrc->mode_reglement_id : (!empty($soc->mode_reglement_id) ? $soc->mode_reglement_id : 0));
+			$cond_reglement_id	= (!empty($objectsrc->cond_reglement_id) ? $objectsrc->cond_reglement_id : (!empty($soc->cond_reglement_id) ? $soc->cond_reglement_id : GETPOST('cond_reglement_id','int'))); // TODO maybe add default value option
+			$mode_reglement_id	= (!empty($objectsrc->mode_reglement_id) ? $objectsrc->mode_reglement_id : (!empty($soc->mode_reglement_id) ? $soc->mode_reglement_id : GETPOST('mode_reglement_id','int')));
 			$fk_account         = (!empty($objectsrc->fk_account) ? $objectsrc->fk_account : (!empty($soc->fk_account) ? $soc->fk_account : 0));
 			$availability_id = (!empty($objectsrc->availability_id) ? $objectsrc->availability_id : (!empty($soc->availability_id) ? $soc->availability_id : 0));
-			$shipping_method_id = (!empty($objectsrc->shipping_method_id) ? $objectsrc->shipping_method_id : (!empty($soc->shipping_method_id) ? $soc->shipping_method_id : 0));
+			$shipping_method_id = (!empty($objectsrc->shipping_method_id) ? $objectsrc->shipping_method_id : (!empty($soc->shipping_method_id) ? $soc->shipping_method_id : GETPOST('shipping_method_id','int')));
 			$warehouse_id       = (!empty($objectsrc->warehouse_id) ? $objectsrc->warehouse_id : (!empty($soc->warehouse_id) ? $soc->warehouse_id : 0));
-			$demand_reason_id = (!empty($objectsrc->demand_reason_id) ? $objectsrc->demand_reason_id : (!empty($soc->demand_reason_id) ? $soc->demand_reason_id : 0));
+			$demand_reason_id = (!empty($objectsrc->demand_reason_id) ? $objectsrc->demand_reason_id : (!empty($soc->demand_reason_id) ? $soc->demand_reason_id : GETPOST('demand_reason_id','int')));
 			$remise_percent		= (!empty($objectsrc->remise_percent) ? $objectsrc->remise_percent : (!empty($soc->remise_percent) ? $soc->remise_percent : 0));
 			$remise_absolue		= (!empty($objectsrc->remise_absolue) ? $objectsrc->remise_absolue : (!empty($soc->remise_absolue) ? $soc->remise_absolue : 0));
 			$dateorder = empty($conf->global->MAIN_AUTOFILL_DATE_ORDER) ?-1 : '';
@@ -1586,13 +1586,13 @@ if ($action == 'create' && $usercancreate)
 	}
 	else
 	{
-		$cond_reglement_id  = $soc->cond_reglement_id;
-		$mode_reglement_id  = $soc->mode_reglement_id;
+		$cond_reglement_id  = !empty($soc->cond_reglement_id) ? $soc->cond_reglement_id : GETPOST('cond_reglement_id','int');
+		$mode_reglement_id  = !empty($soc->mode_reglement_id) ? $soc->mode_reglement_id : GETPOST('mode_reglement_id','int');
 		$fk_account         = $soc->fk_account;
-		$availability_id    = $soc->availability_id;
-		$shipping_method_id = $soc->shipping_method_id;
-		$warehouse_id       = $soc->warehouse_id;
-		$demand_reason_id   = $soc->demand_reason_id;
+		$availability_id    = !empty($soc->availability_id) ? $soc->availability_id : GETPOST('availability_id','int');
+		$shipping_method_id = !empty($soc->shipping_method_id) ? $soc->shipping_method_id : GETPOST('shipping_method_id','int');
+		$warehouse_id       = !empty($soc->warehouse_id) ? $soc->warehouse_id : GETPOST('warehouse_id','int');
+		$demand_reason_id   = !empty($soc->demand_reason_id) ? $soc->demand_reason_id : GETPOST('demand_reason_id','int');
 		$remise_percent     = $soc->remise_percent;
 		$remise_absolue     = 0;
 		$dateorder          = empty($conf->global->MAIN_AUTOFILL_DATE_ORDER) ?-1 : '';
