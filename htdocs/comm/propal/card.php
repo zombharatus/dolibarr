@@ -76,6 +76,9 @@ $confirm = GETPOST('confirm', 'alpha');
 $lineid = GETPOST('lineid', 'int');
 $contactid = GETPOST('contactid', 'int');
 $projectid = GETPOST('projectid', 'int');
+$cond_reglement_id  = GETPOST('cond_reglement_id','int');
+$mode_reglement_id  = GETPOST('mode_reglement_id','int');
+$shipping_method_id = GETPOST('shipping_method_id','int');
 
 // PDF
 $hidedetails = (GETPOST('hidedetails', 'int') ? GETPOST('hidedetails', 'int') : (!empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_DETAILS) ? 1 : 0));
@@ -1523,8 +1526,8 @@ if ($action == 'create')
 
 			$soc = $objectsrc->thirdparty;
 
-			$cond_reglement_id 	= (!empty($objectsrc->cond_reglement_id) ? $objectsrc->cond_reglement_id : (!empty($soc->cond_reglement_id) ? $soc->cond_reglement_id : 0)); // TODO maybe add default value option
-			$mode_reglement_id 	= (!empty($objectsrc->mode_reglement_id) ? $objectsrc->mode_reglement_id : (!empty($soc->mode_reglement_id) ? $soc->mode_reglement_id : 0));
+			$cond_reglement_id 	= (!empty($objectsrc->cond_reglement_id) ? $objectsrc->cond_reglement_id : (!empty($soc->cond_reglement_id) ? $soc->cond_reglement_id : GETPOST('cond_reglement_id','int')));
+			$mode_reglement_id 	= (!empty($objectsrc->mode_reglement_id) ? $objectsrc->mode_reglement_id : (!empty($soc->mode_reglement_id) ? $soc->mode_reglement_id : GETPOST('mode_reglement_id','int')));
 			$remise_percent 	= (!empty($objectsrc->remise_percent) ? $objectsrc->remise_percent : (!empty($soc->remise_percent) ? $soc->remise_percent : 0));
 			$remise_absolue 	= (!empty($objectsrc->remise_absolue) ? $objectsrc->remise_absolue : (!empty($soc->remise_absolue) ? $soc->remise_absolue : 0));
 			$dateinvoice = (empty($dateinvoice) ? (empty($conf->global->MAIN_AUTOFILL_DATE) ?-1 : '') : $dateinvoice);
@@ -1542,6 +1545,9 @@ if ($action == 'create')
 	}
 	else
 	{
+		$cond_reglement_id  = !empty($soc->cond_reglement_id) ? $soc->cond_reglement_id : GETPOST('cond_reglement_id','int');
+		$mode_reglement_id  = !empty($soc->mode_reglement_id) ? $soc->mode_reglement_id : GETPOST('mode_reglement_id','int');
+
 		if (!empty($conf->multicurrency->enabled) && !empty($soc->multicurrency_code)) $currency_code = $soc->multicurrency_code;
 	}
 
@@ -1630,12 +1636,12 @@ if ($action == 'create')
 
 	// Terms of payment
 	print '<tr><td class="nowrap">'.$langs->trans('PaymentConditionsShort').'</td><td>';
-	$form->select_conditions_paiements($soc->cond_reglement_id, 'cond_reglement_id', -1, 1);
+	$form->select_conditions_paiements($cond_reglement_id, 'cond_reglement_id', -1, 1);
 	print '</td></tr>';
 
 	// Mode of payment
 	print '<tr><td>'.$langs->trans('PaymentMode').'</td><td>';
-	$form->select_types_paiements($soc->mode_reglement_id, 'mode_reglement_id');
+	$form->select_types_paiements($mode_reglement_id, 'mode_reglement_id');
 	print '</td></tr>';
 
 	// Bank Account
@@ -1647,7 +1653,7 @@ if ($action == 'create')
 
 	// What trigger creation
 	print '<tr><td>'.$langs->trans('Source').'</td><td>';
-	$form->selectInputReason('', 'demand_reason_id', "SRC_PROP", 1);
+	$form->selectInputReason(GETPOST('demand_reason_id','int'), 'demand_reason_id', "SRC_PROP", 1);
 	print '</td></tr>';
 
 	// Delivery delay
