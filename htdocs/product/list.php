@@ -1035,7 +1035,7 @@ if ($resql)
 		// Label
 		if (!empty($arrayfields['p.label']['checked']))
 		{
-			print '<td >'.$obj->label.'</td>';
+			print '<td style="min-width: 250px;" >'.$obj->label.'</td>';
 			if (!$i) $totalarray['nbfield']++;
 		}
 
