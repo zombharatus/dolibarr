@@ -1407,7 +1407,7 @@ if ($action == 'create')
 								return ($a->real < $b->real) ? -1 : 1;
 							});
 
-							foreach ($product->stock_warehouse as $warehouse_id=>&$stock_warehouse)
+							foreach ($product->stock_warehouse as $warehouse_id=>$stock_warehouse)
 							{
 								if ($stock_warehouse->real > 0)
 								{
