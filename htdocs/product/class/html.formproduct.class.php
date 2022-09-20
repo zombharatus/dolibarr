@@ -182,6 +182,11 @@ class FormProduct
 	 */
 	private function get_parent_path($tab, $final_label = '')
 	{
+		/** SPE TS**/
+		return $tab['label'];
+		/** END SPE TS**/
+
+
 		//phpcs:enable
 		if (empty($final_label)) {
 			$final_label = $tab['label'];

@@ -1668,7 +1668,7 @@ if ($action == 'create') {
 	// Source / Channel - What trigger creation
 	print '<tr><td>'.$langs->trans('Source').'</td><td>';
 	print img_picto('', 'question', 'class="pictofixedwidth"');
-	$form->selectInputReason('', 'demand_reason_id', "SRC_PROP", 1, 'maxwidth200 widthcentpercentminusx');
+	$form->selectInputReason(GETPOST('demand_reason_id','int'), 'demand_reason_id', "SRC_PROP", 1, 'maxwidth200 widthcentpercentminusx');
 	print '</td></tr>';
 
 	// Delivery delay

@@ -111,6 +111,7 @@ llxHeader("", $langs->trans("CommercialArea"));
 
 print load_fiche_titre($langs->trans("CommercialArea"), '', 'commercial');
 
+print '<p style="font-weight: bold">Attention : pour des raisons de performances, le nombres d\'éléments affichés dans certaines listes à été bloqué à 10 </p>';
 print '<div class="fichecenter"><div class="fichethirdleft">';
 
 $tmp = getCustomerProposalPieChart($socid);
@@ -148,6 +149,8 @@ if (!empty($conf->propal->enabled) && $user->rights->propal->lire) {
 	if ($socid) {
 		$sql .= " AND s.rowid = ".((int) $socid);
 	}
+
+	$sql .= $db->plimit($max + 1, 0);
 
 	$resql = $db->query($sql);
 	if ($resql) {
@@ -246,6 +249,7 @@ if (!empty($conf->supplier_proposal->enabled) && $user->rights->supplier_proposa
 		$sql .= " AND s.rowid = ".((int) $socid);
 	}
 
+	$sql .= $db->plimit($max + 1, 0);
 	$resql = $db->query($sql);
 	if ($resql) {
 		$total = 0;
@@ -341,6 +345,7 @@ if (!empty($conf->commande->enabled) && $user->rights->commande->lire) {
 	if ($socid) {
 		$sql .= " AND c.fk_soc = ".((int) $socid);
 	}
+	$sql .= $db->plimit($max + 1, 0);
 
 	$resql = $db->query($sql);
 	if ($resql) {
@@ -439,6 +444,8 @@ if ((!empty($conf->fournisseur->enabled) && empty($conf->global->MAIN_USE_NEW_SU
 		$sql .= " AND cf.fk_soc = ".((int) $socid);
 	}
 
+	$sql .= $db->plimit($max + 1, 0);
+
 	$resql = $db->query($sql);
 	if ($resql) {
 		$total = 0;
@@ -536,6 +543,7 @@ if (!empty($conf->ficheinter->enabled)) {
 		$sql .= " AND s.rowid = sc.fk_soc AND sc.fk_user = ".((int) $user->id);
 	}
 
+	$sql .= $db->plimit($max + 1, 0);
 
 	$resql = $db->query($sql);
 	if ($resql) {
@@ -885,6 +893,7 @@ if (!empty($conf->propal->enabled) && $user->rights->propal->lire) {
 		$sql .= " AND s.rowid = ".((int) $socid);
 	}
 	$sql .= " ORDER BY p.rowid DESC";
+	$sql .= $db->plimit($max + 1, 0);
 
 	$resql = $db->query($sql);
 	if ($resql) {
