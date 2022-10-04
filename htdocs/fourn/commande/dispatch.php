@@ -990,6 +990,9 @@ if ($id > 0 || !empty($ref)) {
 
 						// Qty to dispatch
 						print '<td class="right">';
+						if($remaintodispatch>0){
+							print '<span class="AutoFillQty" style="cursor: pointer;" data-rowname="qty'.$suffix.'" data-value="'.$remaintodispatch.'" ><span class="fa fa-arrow-right" ></span></span>';
+						}
 						print '<input id="qty'.$suffix.'" name="qty'.$suffix.'" type="text" class="width50 right" value="'.(GETPOSTISSET('qty'.$suffix) ? GETPOST('qty'.$suffix, 'int') : (empty($conf->global->SUPPLIER_ORDER_DISPATCH_FORCE_QTY_INPUT_TO_ZERO) ? $remaintodispatch : 0)).'">';
 						print '</td>';
 
@@ -1062,7 +1065,17 @@ if ($id > 0 || !empty($ref)) {
 		print "</table>\n";
 		print '</div>';
 
-		if ($nbproduct) {
+		print "\n".'<script type="text/javascript" language="javascript">';
+		//Add js for AutoFill
+		print ' $(document).ready(function () {';
+		print ' 	$(".AutoFillQty").on(\'click touchstart\', function(){
+							$("input[name="+$(this).data(\'rowname\')+"]").val($(this).data("value")).trigger("change");
+						});';
+		print '	});'."\n";
+		print '	</script>'."\n";
+
+		if ($nbproduct)
+		{
 			$checkboxlabel = $langs->trans("CloseReceivedSupplierOrdersAutomatically", $langs->transnoentitiesnoconv('StatusOrderReceivedAll'));
 
 			print '<div class="center">';
@@ -1245,7 +1258,7 @@ if ($id > 0 || !empty($ref)) {
 						include_once DOL_DOCUMENT_ROOT.'/product/stock/class/productlot.class.php';
 						$lot = new Productlot($db);
 						$lot->fetch(0, $objp->pid, $objp->batch);
-						print '<td class="dispatch_batch_number">'.$lot->getNomUrl(1).'</td>';
+						print '<td class="dispatch_batch_number" data-col="batch"  data-batch="' . htmlentities($objp->batch) . '" data-productid="' . $objp->fk_product . '" >'.$lot->getNomUrl(1).'</td>';
 						if (empty($conf->global->PRODUCT_DISABLE_SELLBY)) {
 							print '<td class="dispatch_dlc">'.dol_print_date($lot->sellby, 'day').'</td>';
 						}

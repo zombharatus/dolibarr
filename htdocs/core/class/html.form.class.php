@@ -2537,7 +2537,7 @@ class Form
 			$selectFieldsGrouped = ", ".$this->db->ifsql("p.stock IS NULL", 0, "p.stock")." AS stock";
 		}
 
-		$sql = "SELECT ";
+		$sql = "SELECT DISTINCT ";
 		$sql .= $selectFields.$selectFieldsGrouped;
 
 		if (!empty($conf->global->PRODUCT_SORT_BY_CATEGORY)) {
