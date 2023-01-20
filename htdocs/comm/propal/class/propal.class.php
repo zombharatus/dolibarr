@@ -1487,6 +1487,8 @@ class Propal extends CommonObject
 				$action = '';
 				$reshook = $hookmanager->executeHooks('createFrom', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 				if ($reshook < 0) {
+					$this->errors += $hookmanager->errors;
+					$this->error = $hookmanager->error;
 					$error++;
 				}
 			}
@@ -4418,8 +4420,8 @@ class PropaleLigne extends CommonObjectLine
 		$sql .= ", qty='".price2num($this->qty)."'";
 		$sql .= ", subprice=".price2num($this->subprice)."";
 		$sql .= ", remise_percent=".price2num($this->remise_percent)."";
-		$sql .= ", price=".price2num($this->price).""; // TODO A virer
-		$sql .= ", remise=".price2num($this->remise).""; // TODO A virer
+		$sql .= ", price=".(float) price2num($this->price).""; // TODO A virer
+		$sql .= ", remise=".(float) price2num($this->remise).""; // TODO A virer
 		$sql .= ", info_bits='".$this->db->escape($this->info_bits)."'";
 		if (empty($this->skip_update_total)) {
 			$sql .= ", total_ht=".price2num($this->total_ht)."";

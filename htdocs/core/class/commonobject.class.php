@@ -2176,7 +2176,7 @@ abstract class CommonObject
 					$sql .= " AND te.entity IS NOT NULL"; // Show all users
 				} else {
 					$sql .= " AND ug.fk_user = te.rowid";
-					$sql .= " AND ug.entity IN (".getEntity($this->element).")";
+					$sql .= " AND ug.entity IN (".getEntity('usergroup').")";
 				}
 			} else {
 				$sql .= ' AND te.entity IN ('.getEntity($this->element).')';
@@ -2246,7 +2246,7 @@ abstract class CommonObject
 					$sql .= " AND te.entity IS NOT NULL"; // Show all users
 				} else {
 					$sql .= " AND ug.fk_user = te.rowid";
-					$sql .= " AND ug.entity IN (".getEntity($this->element).")";
+					$sql .= " AND ug.entity IN (".getEntity('usergroup').")";
 				}
 			} else {
 				$sql .= ' AND te.entity IN ('.getEntity($this->element).')';
@@ -3789,7 +3789,7 @@ abstract class CommonObject
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
-	 *	Add objects linked in llx_element_element.
+	 *	Add an object link into llx_element_element.
 	 *
 	 *	@param		string	$origin		Linked element type
 	 *	@param		int		$origin_id	Linked element id
@@ -4112,6 +4112,21 @@ abstract class CommonObject
 	}
 
 	/**
+	 *	Clear the cache saying that all linked object were already loaded. So next fetchObjectLinked will reload all links.
+	 *
+	 *	@return int						<0 if KO, >0 if OK
+	 *  @see	fetchObjectLinked()
+	 */
+	public function clearObjectLinkedCache()
+	{
+		if ($this->id > 0 && !empty($this->linkedObjectsFullLoaded[$this->id])) {
+			unset($this->linkedObjectsFullLoaded[$this->id]);
+		}
+
+		return 1;
+	}
+
+	/**
 	 *	Update object linked of a current object
 	 *
 	 *	@param	int		$sourceid		Object source id
@@ -4325,7 +4340,7 @@ abstract class CommonObject
 	 *      @param	int		$status			Status to set
 	 *      @param	int		$elementId		Id of element to force (use this->id by default if null)
 	 *      @param	string	$elementType	Type of element to force (use this->table_element by default)
-	 *      @param	string	$trigkey		Trigger key to use for trigger. Use '' means automatic but it not recommended and is deprecated.
+	 *      @param	string	$trigkey		Trigger key to use for trigger. Use '' means automatic but it is not recommended and is deprecated.
 	 *      @param	string	$fieldstatus	Name of status field in this->table_element
 	 *      @return int						<0 if KO, >0 if OK
 	 */
@@ -4375,41 +4390,49 @@ abstract class CommonObject
 		if ($status == 1 && in_array($elementTable, array('inventory'))) {
 			$sql .= ", date_validation = '".$this->db->idate(dol_now())."'";
 		}
-		$sql .= " WHERE rowid=".((int) $elementId);
+		$sql .= " WHERE rowid = ".((int) $elementId);
+		$sql .= " AND ".$fieldstatus." <> ".((int) $status);	// We avoid update if status already correct
 
 		dol_syslog(get_class($this)."::setStatut", LOG_DEBUG);
-		if ($this->db->query($sql)) {
+		$resql = $this->db->query($sql);
+		if ($resql) {
 			$error = 0;
 
-			// Try autoset of trigkey
-			if (empty($trigkey)) {
-				if ($this->element == 'supplier_proposal' && $status == 2) {
-					$trigkey = 'SUPPLIER_PROPOSAL_SIGN'; // 2 = SupplierProposal::STATUS_SIGNED. Can't use constant into this generic class
-				}
-				if ($this->element == 'supplier_proposal' && $status == 3) {
-					$trigkey = 'SUPPLIER_PROPOSAL_REFUSE'; // 3 = SupplierProposal::STATUS_REFUSED. Can't use constant into this generic class
-				}
-				if ($this->element == 'supplier_proposal' && $status == 4) {
-					$trigkey = 'SUPPLIER_PROPOSAL_CLOSE'; // 4 = SupplierProposal::STATUS_CLOSED. Can't use constant into this generic class
-				}
-				if ($this->element == 'fichinter' && $status == 3) {
-					$trigkey = 'FICHINTER_CLASSIFY_DONE';
-				}
-				if ($this->element == 'fichinter' && $status == 2) {
-					$trigkey = 'FICHINTER_CLASSIFY_BILLED';
-				}
-				if ($this->element == 'fichinter' && $status == 1) {
-					$trigkey = 'FICHINTER_CLASSIFY_UNBILLED';
-				}
-			}
+			$nb_rows_affected = $this->db->affected_rows($resql);	// should be 1 or 0 if status was already correct
 
-			if ($trigkey) {
-				// Call trigger
-				$result = $this->call_trigger($trigkey, $user);
-				if ($result < 0) {
-					$error++;
+			if ($nb_rows_affected > 0) {
+				if (empty($trigkey)) {
+					// Try to guess trigkey (for backward compatibility, now we should have trigkey defined into the call of setStatus)
+					if ($this->element == 'supplier_proposal' && $status == 2) {
+						$trigkey = 'SUPPLIER_PROPOSAL_SIGN'; // 2 = SupplierProposal::STATUS_SIGNED. Can't use constant into this generic class
+					}
+					if ($this->element == 'supplier_proposal' && $status == 3) {
+						$trigkey = 'SUPPLIER_PROPOSAL_REFUSE'; // 3 = SupplierProposal::STATUS_REFUSED. Can't use constant into this generic class
+					}
+					if ($this->element == 'supplier_proposal' && $status == 4) {
+						$trigkey = 'SUPPLIER_PROPOSAL_CLOSE'; // 4 = SupplierProposal::STATUS_CLOSED. Can't use constant into this generic class
+					}
+					if ($this->element == 'fichinter' && $status == 3) {
+						$trigkey = 'FICHINTER_CLASSIFY_DONE';
+					}
+					if ($this->element == 'fichinter' && $status == 2) {
+						$trigkey = 'FICHINTER_CLASSIFY_BILLED';
+					}
+					if ($this->element == 'fichinter' && $status == 1) {
+						$trigkey = 'FICHINTER_CLASSIFY_UNBILLED';
+					}
 				}
-				// End call triggers
+
+				if ($trigkey) {
+					// Call trigger
+					$result = $this->call_trigger($trigkey, $user);
+					if ($result < 0) {
+						$error++;
+					}
+					// End call triggers
+				}
+			} else {
+				// The status was probably already good. We do nothing more, no triggers.
 			}
 
 			if (!$error) {
@@ -6031,14 +6054,15 @@ abstract class CommonObject
 							//var_dump('key '.$key.' '.$value.' type='.$extrafields->attributes[$this->table_element]['type'][$key].' '.$this->array_options["options_".$key]);
 						}
 					}
+				}
 
-					// If field is a computed field, value must become result of compute
-					foreach ($tab as $key => $value) {
-						if (!empty($extrafields->attributes[$this->table_element]) && !empty($extrafields->attributes[$this->table_element]['computed'][$key])) {
-							//var_dump($conf->disable_compute);
-							if (empty($conf->disable_compute)) {
-								$this->array_options["options_".$key] = dol_eval($extrafields->attributes[$this->table_element]['computed'][$key], 1, 0, '');
-							}
+				// If field is a computed field, value must become result of compute (regardless of whether a row exists
+				// in the element's extrafields table)
+				foreach ($extrafields->attributes[$this->table_element]['label'] as $key => $val) {
+					if (!empty($extrafields->attributes[$this->table_element]) && !empty($extrafields->attributes[$this->table_element]['computed'][$key])) {
+						//var_dump($conf->disable_compute);
+						if (empty($conf->disable_compute)) {
+							$this->array_options["options_".$key] = dol_eval($extrafields->attributes[$this->table_element]['computed'][$key], 1, 0, '');
 						}
 					}
 				}
@@ -8104,7 +8128,7 @@ abstract class CommonObject
 
 						if ($display_type == 'card') {
 							$out .= '<tr '.($html_id ? 'id="'.$html_id.'" ' : '').$csstyle.' class="field_options_'.$key.' '.$class.$this->element.'_extras_'.$key.' trextrafields_collapse'.$extrafields_collapse_num.(!empty($this->id)?'_'.$this->id:'').'" '.$domData.' >';
-							if (!empty($conf->global->MAIN_VIEW_LINE_NUMBER) && ($action == 'view' || $action == 'valid' || $action == 'editline')) {
+							if (!empty($conf->global->MAIN_VIEW_LINE_NUMBER) && ($action == 'view' || $action == 'valid' || $action == 'editline' || $action == 'confirm_valid' || $action == 'confirm_cancel')) {
 								$out .= '<td></td>';
 							}
 							$out .= '<td class="titlefieldcreate wordbreak';
@@ -8820,7 +8844,11 @@ abstract class CommonObject
 				// $this->{$field} may be null, '', 0, '0', 123, '123'
 				if ((isset($this->{$field}) && $this->{$field} != '') || !empty($info['notnull'])) {
 					if (!isset($this->{$field})) {
-						$queryarray[$field] = 0;
+						if (!empty($info['default'])) {
+							$queryarray[$field] = $info['default'];
+						} else {
+							$queryarray[$field] = 0;
+						}
 					} else {
 						$queryarray[$field] = (int) $this->{$field};		// If '0', it may be set to null later if $info['notnull'] == -1
 					}
@@ -9440,6 +9468,12 @@ abstract class CommonObject
 			if (!$res) {
 				$error++;
 			}
+		}
+
+		// Delete linked object
+		$res = $this->deleteObjectLinked();
+		if ($res < 0) {
+			$error++;
 		}
 
 		if (!$error && !empty($this->isextrafieldmanaged)) {

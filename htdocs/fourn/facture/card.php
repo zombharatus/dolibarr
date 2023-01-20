@@ -2616,7 +2616,9 @@ if ($action == 'create') {
 			$multicurrency_totaldeposits = $object->getSumDepositsUsed(1);
 			$multicurrency_resteapayer = price2num($object->multicurrency_total_ttc - $multicurrency_totalpaid - $multicurrency_totalcreditnotes - $multicurrency_totaldeposits, 'MT');
 			// Code to fix case of corrupted data
-			if ($resteapayer == 0 && $multicurrency_resteapayer != 0) {
+			// TODO We should not need this. Also data comes from not reliable value of $object->multicurrency_total_ttc that may be wrong if it was
+			// calculated by summing lines that were in a currency for some of them and into another for others (lines from discount/down payment into another currency for example)
+			if ($resteapayer == 0 && $multicurrency_resteapayer != 0 && $object->multicurrency_code != $conf->currency) {
 				$resteapayer = price2num($multicurrency_resteapayer / $object->multicurrency_tx, 'MT');
 			}
 		}
@@ -2626,7 +2628,7 @@ if ($action == 'create') {
 		}
 		$resteapayeraffiche = $resteapayer;
 
-		if (!empty($conf->global->FACTURE_DEPOSITS_ARE_JUST_PAYMENTS)) {	// Never use this
+		if (!empty($conf->global->FACTURE_SUPPLIER_DEPOSITS_ARE_JUST_PAYMENTS)) {	// Never use this
 			$filterabsolutediscount = "fk_invoice_supplier_source IS NULL"; // If we want deposit to be substracted to payments only and not to total of final invoice
 			$filtercreditnote = "fk_invoice_supplier_source IS NOT NULL"; // If we want deposit to be substracted to payments only and not to total of final invoice
 		} else {
@@ -3503,7 +3505,7 @@ if ($action == 'create') {
 				}
 				print '</span>';
 				print '</td>';
-				print '<td class="right'.($resteapayeraffiche ? ' amountremaintopay' : (' '.$cssforamountpaymentcomplete)).'">'.(!empty($object->multicurrency_code) ? $object->multicurrency_code : $conf->currency).' '.price(price2num($object->multicurrency_tx*$resteapayeraffiche, 'MT')).'</td><td>&nbsp;</td></tr>';
+				print '<td class="right'.($resteapayeraffiche ? ' amountremaintopay' : (' '.$cssforamountpaymentcomplete)).'">'.(!empty($object->multicurrency_code) ? $object->multicurrency_code : $conf->currency).' '.price(price2num($multicurrency_resteapayer, 'MT')).'</td><td>&nbsp;</td></tr>';
 			}
 		} else // Credit note
 		{

@@ -17,17 +17,44 @@
  */
 
 /**
- *      \file       test/phpunit/AdminLibTest.php
- *      \ingroup    test
+ *      \file       test/phpunit/WebsiteTest.php
+ *		\ingroup    test
  *      \brief      PHPUnit test
- *      \remarks    To run this script as CLI:  phpunit filename.php
+ *		\remarks	To run this script as CLI:  phpunit filename.php
  */
 
 global $conf,$user,$langs,$db;
 //define('TEST_DB_FORCE_TYPE','mysql');	// This is to force using mysql driver
 //require_once 'PHPUnit/Autoload.php';
-require_once dirname(__FILE__).'/../../htdocs/master.inc.php';
-require_once dirname(__FILE__).'/../../htdocs/core/lib/admin.lib.php';
+
+if (! defined('NOREQUIRESOC')) {
+	define('NOREQUIRESOC', '1');
+}
+if (! defined('NOCSRFCHECK')) {
+	define('NOCSRFCHECK', '1');
+}
+if (! defined('NOTOKENRENEWAL')) {
+	define('NOTOKENRENEWAL', '1');
+}
+if (! defined('NOREQUIREMENU')) {
+	define('NOREQUIREMENU', '1'); // If there is no menu to show
+}
+if (! defined('NOREQUIREHTML')) {
+	define('NOREQUIREHTML', '1'); // If we don't need to load the html.form.class.php
+}
+if (! defined('NOREQUIREAJAX')) {
+	define('NOREQUIREAJAX', '1');
+}
+if (! defined("NOLOGIN")) {
+	define("NOLOGIN", '1');       // If this page is public (can be called outside logged session)
+}
+if (! defined("NOSESSION")) {
+	define("NOSESSION", '1');
+}
+
+require_once dirname(__FILE__).'/../../htdocs/main.inc.php';
+require_once dirname(__FILE__).'/../../htdocs/core/lib/website.lib.php';
+
 
 if (empty($user->id)) {
 	print "Load permissions for admin user nb 1\n";
@@ -42,11 +69,10 @@ $conf->global->MAIN_DISABLE_ALL_MAILS=1;
  *
  * @backupGlobals disabled
  * @backupStaticAttributes enabled
- * @remarks backupGlobals must be disabled to have db,conf,user and lang not erased.
+ * @remarks	backupGlobals must be disabled to have db,conf,user and lang not erased.
  */
-class AdminLibTest extends PHPUnit\Framework\TestCase
+class WebsiteTest extends PHPUnit\Framework\TestCase
 {
-	protected $backupGlobalsBlacklist = array('conf', 'user', 'langs', 'db');
 	protected $savconf;
 	protected $savuser;
 	protected $savlangs;
@@ -56,7 +82,7 @@ class AdminLibTest extends PHPUnit\Framework\TestCase
 	 * Constructor
 	 * We save global variables into local variables
 	 *
-	 * @return AdminLibTest
+	 * @return SecurityTest
 	 */
 	public function __construct()
 	{
@@ -70,7 +96,6 @@ class AdminLibTest extends PHPUnit\Framework\TestCase
 		$this->savdb=$db;
 
 		print __METHOD__." db->type=".$db->type." user->id=".$user->id;
-
 		//print " - db ".$db->db;
 		print "\n";
 	}
@@ -83,7 +108,7 @@ class AdminLibTest extends PHPUnit\Framework\TestCase
 	public static function setUpBeforeClass()
 	{
 		global $conf,$user,$langs,$db;
-		$db->begin(); // This is to have all actions inside a transaction even if test launched without suite.
+		$db->begin();	// This is to have all actions inside a transaction even if test launched without suite.
 
 		print __METHOD__."\n";
 	}
@@ -104,7 +129,7 @@ class AdminLibTest extends PHPUnit\Framework\TestCase
 	/**
 	 * Init phpunit tests
 	 *
-	 * @return  void
+	 * @return	void
 	 */
 	protected function setUp()
 	{
@@ -116,6 +141,7 @@ class AdminLibTest extends PHPUnit\Framework\TestCase
 
 		print __METHOD__."\n";
 	}
+
 	/**
 	 * End phpunit tests
 	 *
@@ -126,58 +152,27 @@ class AdminLibTest extends PHPUnit\Framework\TestCase
 		print __METHOD__."\n";
 	}
 
+
 	/**
-	 * testVersionCompare
+	 * testGetPagesFromSearchCriterias
 	 *
 	 * @return	void
 	 */
-	public function testVersionCompare()
+	public function testGetPagesFromSearchCriterias()
 	{
-		global $conf,$user,$langs,$db;
-		$conf=$this->savconf;
-		$user=$this->savuser;
-		$langs=$this->savlangs;
-		$db=$this->savdb;
+		global $db;
 
-		$result=versioncompare(array(3,1,-4), array(3,1,1));
-		print __METHOD__." result=".$result."\n";
-		$this->assertEquals(-3, $result);
-		$result=versioncompare(array(3,1,0), array(3,1,1));
-		print __METHOD__." result=".$result."\n";
-		$this->assertEquals(-3, $result);
-		$result=versioncompare(array(3,1,0), array(3,2,0));
-		print __METHOD__." result=".$result."\n";
-		$this->assertEquals(-2, $result);
-		$result=versioncompare(array(3,1,0), array(3,1,0));
-		print __METHOD__." result=".$result."\n";
-		$this->assertEquals(0, $result);
+		$s = "123') OR 1=1-- \' xxx";
+		/*
+		var_dump($s);
+		var_dump($db->escapeforlike($s));
+		var_dump($db->escape($db->escapeforlike($s)));
+		*/
 
-		return $result;
-	}
-
-	/**
-	 * testEnableModule
-	 *
-	 * @return  void
-	 */
-	public function testEnableModule()
-	{
-		global $conf, $db, $langs, $user;
-
-		require_once dirname(__FILE__).'/../../htdocs/core/modules/modExpenseReport.class.php';
-		print "Enable module modExpenseReport";
-		$moduledescriptor=new modExpenseReport($db);
-		$result = $moduledescriptor->init();
-		print __METHOD__." result=".$result."\n";
-		$this->assertEquals(1, $result);
-		$conf->setValues($db);
-
-		require_once dirname(__FILE__).'/../../htdocs/core/modules/modApi.class.php';
-		print "Enable module modAPI";
-		$moduledescriptor=new modApi($db);
-		$result = $moduledescriptor->init();
-		print __METHOD__." result=".$result."\n";
-		$this->assertEquals(1, $result);
-		$conf->setValues($db);
+		$res = getPagesFromSearchCriterias('page,blogpost', 'meta,content', $s, 2, 'date_creation', 'DESC', 'en');
+		//var_dump($res);
+		print __METHOD__." message=".$res['code']."\n";
+		// We must found no line (so code should be KO). If we found somethiing, it means there is a SQL injection of the 1=1
+		$this->assertEquals($res['code'], 'KO');
 	}
 }
