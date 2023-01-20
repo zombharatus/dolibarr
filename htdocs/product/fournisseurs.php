@@ -269,10 +269,13 @@ if (empty($reshook)) {
 				if ($ret == -3) {
 					$error++;
 
-					$object->fetch($object->product_id_already_linked);
-					$productLink = $object->getNomUrl(1, 'supplier');
+					$tmpobject = new Product($db);
+					$tmpobject->fetch($object->product_id_already_linked);
+					$productLink = $tmpobject->getNomUrl(1, 'supplier');
 
-					setEventMessages($langs->trans("ReferenceSupplierIsAlreadyAssociatedWithAProduct", $productLink), null, 'errors');
+					$texttoshow = $langs->trans("ReferenceSupplierIsAlreadyAssociatedWithAProduct", '{s1}');
+					$texttoshow = str_replace('{s1}', $productLink, $texttoshow);
+					setEventMessages($texttoshow, null, 'errors');
 				} elseif ($ret < 0) {
 					$error++;
 					setEventMessages($object->error, $object->errors, 'errors');
@@ -508,9 +511,9 @@ if ($id > 0 || $ref) {
 				print '<tr><td class="fieldrequired">'.$langs->trans("SupplierRef").'</td><td>';
 				if ($rowid) {
 					print '<input type="hidden" name="ref_fourn_old" value="'.$object->ref_supplier.'">';
-					print '<input class="flat width150" maxlength="30" name="ref_fourn" value="'.$object->ref_supplier.'">';
+					print '<input class="flat width150" maxlength="128" name="ref_fourn" value="'.$object->ref_supplier.'">';
 				} else {
-					print '<input class="flat width150" maxlength="30" name="ref_fourn" value="'.(GETPOST("ref_fourn") ? GETPOST("ref_fourn") : '').'">';
+					print '<input class="flat width150" maxlength="128" name="ref_fourn" value="'.(GETPOST("ref_fourn") ? GETPOST("ref_fourn") : '').'">';
 				}
 				print '</td>';
 				print '</tr>';
