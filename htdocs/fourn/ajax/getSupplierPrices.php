@@ -83,6 +83,12 @@ if ($idprod > 0) {
 			}
 
 			$label = price($price, 0, $langs, 0, 0, -1, $conf->currency)."/".$langs->trans("Unit");
+			
+
+			// AJOUT SPE
+			$label.= ' ' . _truncateAuto($productSupplier->fourn_name) . ' ' . date('d/m/Y', $productSupplier->fourn_date_modification);
+			// FIN AJOUT SPE
+
 			if ($productSupplier->fourn_ref) {
 				$label .= ' ('.$productSupplier->fourn_ref.')';
 			}
@@ -132,3 +138,16 @@ if ($idprod > 0) {
 }
 
 echo json_encode($prices);
+
+// AJOUT SPE
+function _truncateAuto($text, $chars = 25) {
+	if (strlen($text) <= $chars) {
+		return $text;
+	}
+	$text = $text." ";
+	$text = substr($text,0,$chars);
+	$text = substr($text,0,strrpos($text,' '));
+	$text = $text."...";
+	return $text;
+}
+// FIN AJOUT SPE
