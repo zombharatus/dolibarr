@@ -206,7 +206,7 @@ TITLE BUTTON
 
 .btnTitle, a.btnTitle {
 	display: inline-block;
-	padding: 4px 4px 4px 4px;
+	padding: 6px 12px;
 	font-weight: 400;
 	/* line-height: 1; */
 	text-align: center;
@@ -251,8 +251,8 @@ a.btnTitle.btnTitleSelected {
 	border-radius: 3px;
 	position: relative;
 	text-align: center;
-	/* color: #ffffff;
-	background-color: rgb(<?php print $colortextlink; ?>); */
+	 /*color: #ffffff;*/
+	background-color: rgba(237, 237, 237, 0.62);
 	font-size: 12px;
 	text-decoration: none;
 	box-shadow: none;
@@ -274,7 +274,7 @@ a.btnTitle.btnTitleSelected {
 }
 
 .btnTitle>.fa {
-	font-size: 2em;
+	font-size: 1.5em;
 	display: block;
 }
 

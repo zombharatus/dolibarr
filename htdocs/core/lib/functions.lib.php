@@ -10670,7 +10670,7 @@ function dolGetButtonTitle($label, $helpText = '', $iconClass = 'fa fa-file', $u
 
 	$button = '<'.$tag.' '.$compiledAttributes.'>';
 	$button .= '<span class="'.$iconClass.' valignmiddle btnTitle-icon"></span>';
-	if (!empty($params['forcenohideoftext'])) {
+	if (!empty($params['forcenohideoftext']) || true) {
 		$button .= '<span class="valignmiddle text-plus-circle btnTitle-label'.(empty($params['forcenohideoftext']) ? ' hideonsmartphone' : '').'">'.$label.'</span>';
 	}
 	$button .= '</'.$tag.'>';
