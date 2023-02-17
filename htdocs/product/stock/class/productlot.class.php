@@ -596,7 +596,7 @@ class Productlot extends CommonObject
 	 */
 	public function getNomUrl($withpicto = 0, $option = '', $notooltip = 0, $maxlen = 24, $morecss = '', $save_lastsearch_value = -1)
 	{
-		global $langs, $conf, $db;
+		global $langs, $conf, $db, $hookmanager, $action;
 		global $dolibarr_main_authentication, $dolibarr_main_demo;
 		global $menumanager;
 
@@ -657,6 +657,24 @@ class Productlot extends CommonObject
 			$result .= $this->batch;
 		}
 		$result .= $linkend;
+
+
+		$hookmanager->initHooks(array('productlotdao'));
+		$parameters = array(
+			'id'=>$this->id,
+			'getnomurl' => &$result,
+			'withpicto '=> $withpicto,
+			'option'=> $option,
+			'maxlen'=> $maxlen,
+			'notooltip'=> $notooltip,
+			'save_lastsearch_value'=> $save_lastsearch_value
+		);
+		$reshook = $hookmanager->executeHooks('getNomUrl', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+		if ($reshook > 0) {
+			$result = $hookmanager->resPrint;
+		} else {
+			$result .= $hookmanager->resPrint;
+		}
 
 		return $result;
 	}
