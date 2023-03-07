@@ -2311,7 +2311,7 @@ class Form
 			if (!empty($conf->global->PRODUIT_CUSTOMER_PRICES) && !empty($socid)) {
 				$urloption .= '&socid='.$socid;
 			}
-			$out .= ajax_autocompleter($selected, $htmlname, DOL_URL_ROOT.'/product/ajax/products.php', $urloption, $conf->global->PRODUIT_USE_SEARCH_TO_SELECT, 1, $ajaxoptions);
+			$out .= ajax_autocompleter($selected, $htmlname, DOL_URL_ROOT.'/product/ajax/products.php', $urloption, $conf->global->PRODUIT_USE_SEARCH_TO_SELECT, 0, $ajaxoptions); // SPE THERSANE remove autoselect
 
 			if (!empty($conf->variants->enabled) && is_array($selected_combinations)) {
 				// Code to automatically insert with javascript the select of attributes under the select of product
