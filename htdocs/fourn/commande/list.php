@@ -388,6 +388,25 @@ if (empty($reshook)) {
 				$objecttmp->origin    = 'order_supplier';
 				$objecttmp->origin_id = $id_order;
 
+
+
+				// SPE THERSANE
+				if (!empty($createbills_onebythird)){
+
+					$ref_supplier_for_invoice = GETPOST('ref_supplier');
+					if(!empty($ref_supplier_for_invoice)) {
+						$objecttmp->ref_supplier = $ref_supplier_for_invoice;
+					}
+
+					$dPrefix = 'date_echeance';
+					$date_echeance = dol_mktime(12, 0, 0, GETPOST($dPrefix.'month', 'int'), GETPOST($dPrefix.'day', 'int'), GETPOST($dPrefix.'year', 'int'));
+					if (!empty($date_echeance)) {
+						$objecttmp->date_echeance = $date_echeance;
+					}
+				}
+				// END SPE THERSANE
+
+
 				$res = $objecttmp->create($user);
 
 				if ($res > 0) {
@@ -1178,6 +1197,51 @@ if ($resql) {
 		print $form->selectyesno('validate_invoices', 1, 1);
 		print '</td>';
 		print '</tr>';
+
+		// SPE THERSANE
+		print '<tr class="toggle-advance-supplier-input" >';
+		print '		<td>';
+		print $langs->trans('supplierRef');
+		print '		</td>';
+		print '		<td>';
+		print '			<input type="text" name="ref_supplier" value="'.GETPOST('ref_supplier').'" >';
+		print '		</td>';
+		print '</tr>';
+		print '<tr class="toggle-advance-supplier-input" >';
+		print '		<td>';
+		print $langs->trans('DateDue');
+		print '		</td>';
+		print '		<td>';
+//		print '			<input type="date" name="date_lim_reglement" value="'.GETPOST('date_lim_reglement').'" >';
+		print $form->selectDate('-1', 'date_echeance', '', '', '', '', 1, 1);
+		print '		</td>';
+		print '</tr>';
+
+		print '
+				<style >
+					.toggle-advance-supplier-input{display: none;}
+					.toggle-advance-supplier-input.--show{display: table-row;}
+				</style>
+				<script>
+					$(document).ready(function(){
+						let displayMoreSupplierInput = function (){
+							if($("#createbills_onebythird").val() == 1){
+                               $(".toggle-advance-supplier-input").addClass("--show");
+							}else{
+                                $(".toggle-advance-supplier-input").removeClass("--show");
+							}
+						}
+
+                        displayMoreSupplierInput();
+                        $(document).on("change", "#createbills_onebythird", function() {
+							displayMoreSupplierInput();
+						});
+
+					});
+				</script>
+		';
+		// SPE THERSANE
+
 		print '</table>';
 
 		print '<br>';
