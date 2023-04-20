@@ -2642,7 +2642,12 @@ if ($action == 'create') {
 			//print '<tr class="liste_titre"><td colspan="2">'.$langs->trans("ToOrder").'</td></tr>';
 			print '<tr><td class="fieldrequired">'.$langs->trans("OrderDate").'</td><td>';
 			$date_com = dol_mktime(GETPOST('rehour', 'int'), GETPOST('remin', 'int'), GETPOST('resec', 'int'), GETPOST('remonth', 'int'), GETPOST('reday', 'int'), GETPOST('reyear', 'int'));
-			if (empty($date_com)) {
+			// SPE TS
+			if (empty($date_com) && !empty($object->date_commande)) {
+				$date_com = $object->date_commande;
+			}
+			// END SPE TS
+			else if (empty($date_com)) {
 				$date_com = dol_now();
 			}
 			print $form->selectDate($date_com, '', 1, 1, '', "commande", 1, 1);

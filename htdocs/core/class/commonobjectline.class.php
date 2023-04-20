@@ -81,6 +81,9 @@ abstract class CommonObjectLine extends CommonObject
 
 	public $desc;
 
+	/**
+	 * @var Product $product
+	 */
 	public $product;			// To store full product object after a fetch_product() on a line
 	public $product_ref;		// ref in product table
 	public $product_label;		// label in product table
