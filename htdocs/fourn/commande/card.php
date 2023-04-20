@@ -366,10 +366,15 @@ if (empty($reshook)) {
 
 			$result = $object->setStatus($user, $newstatus);
 			if ($result > 0) {
+
+
+				// SPE TS
 				// Currently the "Re-open" also remove the billed flag because there is no button "Set unpaid" yet.
-				$sql = 'UPDATE '.MAIN_DB_PREFIX.'commande_fournisseur';
-				$sql .= ' SET billed = 0';
-				$sql .= ' WHERE rowid = '.((int) $object->id);
+				// MAINTENANT YA LE BOUTON
+//				$sql = 'UPDATE '.MAIN_DB_PREFIX.'commande_fournisseur';
+//				$sql .= ' SET billed = 0';
+//				$sql .= ' WHERE rowid = '.((int) $object->id);
+				// END SPE TS
 
 				$resql = $db->query($sql);
 
@@ -402,6 +407,15 @@ if (empty($reshook)) {
 			setEventMessages($object->error, $object->errors, 'errors');
 		}
 	}
+
+	// SPE TS
+	if ($action == 'classifyunbilled' && $usercancreate) {
+		$ret = $object->classifyUnBilled($user);
+		if ($ret < 0) {
+			setEventMessages($object->error, $object->errors, 'errors');
+		}
+	}
+	// END SPE TS
 
 	// Add a product line
 	if ($action == 'addline' && $usercancreate) {
@@ -2598,6 +2612,13 @@ if ($action == 'create') {
 					}
 				}
 			}
+
+			// SPE TS
+			// Classify unbilled manually
+			if ($usercancreate && $object->billed > 0 && $object->statut > $object::STATUS_DRAFT) {  // sta
+				print '<a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&action=classifyunbilled&token='.newToken().'">'.$langs->trans("ClassifyUnbilled").'</a>';
+			}
+			// END SPE TS
 
 			// Create a remote order using WebService only if module is activated
 			if (!empty($conf->syncsupplierwebservices->enabled) && $object->statut >= 2) { // 2 means accepted

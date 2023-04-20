@@ -1021,6 +1021,54 @@ class CommandeFournisseur extends CommonOrder
 		}
 	}
 
+// SPE TS
+	/**
+	 *	Class invoiced the supplier order
+	 *
+	 *  @param      User        $user       Object user making the change
+	 *	@return     int     	            <0 if KO, 0 if already billed,  >0 if OK
+	 */
+	public function classifyUnBilled(User $user)
+	{
+		$error = 0;
+
+		if (empty($this->billed)) {
+			return 0;
+		}
+
+		$this->db->begin();
+
+		$sql = 'UPDATE '.MAIN_DB_PREFIX.'commande_fournisseur SET billed = 0';
+		$sql .= " WHERE rowid = ".((int) $this->id).' AND fk_statut > '.self::STATUS_DRAFT;;
+
+		if ($this->db->query($sql)) {
+			if (!$error) {
+				// Call trigger
+				$result = $this->call_trigger('ORDER_SUPPLIER_CLASSIFY_UNBILLED', $user);
+				if ($result < 0) {
+					$error++;
+				}
+				// End call triggers
+			}
+
+			if (!$error) {
+				$this->billed = 1;
+
+				$this->db->commit();
+				return 1;
+			} else {
+				$this->db->rollback();
+				return -1;
+			}
+		} else {
+			dol_print_error($this->db);
+
+			$this->db->rollback();
+			return -1;
+		}
+	}
+// END SPE TS
+
 	/**
 	 * 	Approve a supplier order
 	 *
