@@ -138,6 +138,12 @@ $usercanread	= ($user->rights->fournisseur->commande->lire || $user->rights->sup
 $usercancreate	= ($user->rights->fournisseur->commande->creer || $user->rights->supplier_order->creer);
 $usercandelete	= (($user->rights->fournisseur->commande->supprimer || $user->rights->supplier_order->supprimer) || ($usercancreate && isset($object->statut) && $object->statut == $object::STATUS_DRAFT));
 
+/** SPE THERSANE */
+if($usercandelete && ($object->statut == $object::STATUS_RECEIVED_PARTIALLY || $object->statut == $object::STATUS_RECEIVED_COMPLETELY)){
+	$usercandelete = false;
+}
+/** FIN SPE THERSANE */
+
 // Advanced permissions
 $usercanvalidate = ((empty($conf->global->MAIN_USE_ADVANCED_PERMS) && !empty($usercancreate)) || (!empty($conf->global->MAIN_USE_ADVANCED_PERMS) && !empty($user->rights->fournisseur->supplier_order_advance->validate)));
 

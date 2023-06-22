@@ -4570,7 +4570,7 @@ class Form
 	 */
 	public function selectUnits($selected = '', $htmlname = 'units', $showempty = 0, $unit_type = '')
 	{
-		global $langs;
+		global $langs, $conf;
 
 		$langs->load('products');
 
@@ -4578,7 +4578,7 @@ class Form
 
 		$sql = "SELECT rowid, label, code FROM ".$this->db->prefix()."c_units";
 		$sql .= ' WHERE active > 0';
-		if (!empty($unit_type)) {
+		if (!empty($unit_type) && empty($conf->global->MAIN_UNLOCK_UNIT_TYPE_SELECT)) {
 			$sql .= " AND unit_type = '".$this->db->escape($unit_type)."'";
 		}
 		$sql .= " ORDER BY sortorder";
