@@ -2343,13 +2343,13 @@ function pdf_getLinkedObjects(&$object, $outputlangs)
 
 	foreach ($object->linkedObjects as $objecttype => $objects) {
 
-		// SPE THERSANE
+		// SPE TS au cas ou le hook ne marche pas
 		$supplierElements = array('supplier_proposal', 'supplier_order', 'order_supplier', 'proposal_supplier');
 		if( in_array($object->element, $supplierElements) && !in_array($objecttype, $supplierElements)){
 			// Remove customer element from supplier PDF
 			continue;
 		}
-		// EN SPE THERSANE
+		// EN SPE TS
 
 
 		if ($objecttype == 'facture') {
@@ -2461,8 +2461,10 @@ function pdf_getLinkedObjects(&$object, $outputlangs)
 	if (is_object($hookmanager)) {
 		$parameters = array('linkedobjects' => $linkedobjects, 'outputlangs'=>$outputlangs);
 		$action = '';
+
 		$reshook = $hookmanager->executeHooks('pdf_getLinkedObjects', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
-		if ($reshook > 0 && !empty($hookmanager->resArray)) {
+
+		if ($reshook > 0 && is_array($hookmanager->resArray)) {
 			$linkedobjects = $hookmanager->resArray;
 		}
 	}
