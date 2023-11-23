@@ -2379,7 +2379,6 @@ class CommandeFournisseur extends CommonOrder
 		$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."entrepot as e ON cfd.fk_entrepot = e.rowid";
 		$sql .= " WHERE cfd.fk_commande = ".((int) $this->id);
 		$sql .= " AND cfd.fk_product = p.rowid";
-		$sql .= " AND p.fk_product_type = 0";
 		if ($status >= 0) {
 			$sql .= " AND cfd.status = ".((int) $status);
 		}

@@ -176,6 +176,7 @@ function ordersupplier_prepare_head(CommandeFournisseur $object)
 				$sumQtyAllreadyDispatched = $sumQtyAllreadyDispatched + $dispachedLines[$line]['qty'];
 			}
 			for ($line = 0 ; $line < $nbLinesOrdered; $line++) {
+				if($object->lines[$line]->product_type != 0 ) continue;
 				$sumQtyOrdered = $sumQtyOrdered + $object->lines[$line]->qty;
 			}
 			$head[$h][1] .= '<span class="badge marginleftonlyshort">'.price2num($sumQtyAllreadyDispatched, 'MS').' / '.price2num($sumQtyOrdered, 'MS').'</span>';
