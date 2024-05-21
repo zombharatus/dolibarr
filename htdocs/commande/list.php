@@ -2101,7 +2101,11 @@ if ($resql) {
 			if (!$i) {
 				$totalarray['pos'][$totalarray['nbfield']] = 'c.total_ttc';
 			}
+			if (isset($totalarray['val']['c.total_ttc'])) {
 			$totalarray['val']['c.total_ttc'] += $obj->total_ttc;
+			} else {
+				$totalarray['val']['c.total_ttc'] = $obj->total_ttc;
+			}
 		}
 
 		// Currency
